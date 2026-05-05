@@ -28,8 +28,7 @@ public:
     void     display(ostream& out)const;                       
     bool     isEmpty();  
     int      mySize(); 
-    int     countByAreaCode(string areaCode);
-
+ 
 };
 ostream& operator<<(ostream& out, const LinkedList& list);
 #endif
