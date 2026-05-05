@@ -14,11 +14,12 @@ Algorithms, Spring 2026.
 DATA STRUCTURES USED
 ------------------------------------------------------------
 
-1. Doubly Linked List
+1. Singly Linked List
    - Used as the primary storage structure for all contacts.
-   - Allows efficient insertion at the end in O(1)
-   - Allows efficient deletion once the node pointer is known in O(1)
-   - Allows full traversal for phone-based search in O(n)
+   - Allows insertion at the end by traversing to the last node in O(n)
+   - Allows deletion using two pointers (prev + current) in O(n)
+   - Since all phone-based operations require traversal anyway,
+     a singly linked list is sufficient and simpler to implement
    - Reflects the List chapter covered in the course (Ch02 / Ch05)
 
 2. Binary Search Tree (BST)
@@ -93,25 +94,5 @@ SAMPLE MENU
 Enter your choice:
 
 
-------------------------------------------------------------
 
-
-
-What was modified or rejected:
-  - AI suggested using std::unordered_map for O(1) phone lookup.
-    We rejected this because hash maps were not covered in our syllabus
-    and we could not fully justify the internal implementation.
-  - AI also suggested using std::map instead of a custom BST.
-    We replaced it with a hand-written BST to match our course
-    material (Ch06) and ensure we could explain every part.
-
-
-
-What the group implemented themselves:
-  - All BST operations (insert, search, delete, in-order traversal)
-  - All Linked List operations (insert, delete, traverse)
-  - The ContactBook integration layer connecting both structures
-  - The main menu and input handling in main.cpp
-  - The design decision to use phone number as the primary key
-
-
+============================================================
