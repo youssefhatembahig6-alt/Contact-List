@@ -71,14 +71,14 @@ NOTES ABOUT COMPLEXITY
 
 FILE STRUCTURE
 ------------------------------------------------------------
-Contact.h           - Contact struct (name, phone, email, address)
-LinkedList.h        - Singly Linked List class declaration
-LinkedList.cpp      - Singly Linked List implementation
-AVLTree.h           - AVL Tree class declaration
-AVLTree.cpp         - AVL Tree implementation
-ContactBook.h       - ContactBook class declaration
-ContactBook.cpp     - ContactBook logic combining both structures
-main.cpp            - Main menu and user interaction
+-Contact.h           - Contact struct (name, phone, email, address)
+-LinkedList.h        - Singly Linked List class declaration
+-LinkedList.cpp      - Singly Linked List implementation
+-AVLTree.h           - AVL Tree class declaration
+-AVLTree.cpp         - AVL Tree implementation
+-ContactBook.h       - ContactBook class declaration
+-ContactBook.cpp     - ContactBook logic combining both structures
+-main.cpp            - Main menu and user interaction
 
 
 HOW TO COMPILE AND RUN
