@@ -137,6 +137,7 @@ void LinkedList::display(ostream& out) const {
     }
 }
 
+
 ostream& operator<<(ostream& out, const LinkedList& list) {
     list.display(out);
     return out;
