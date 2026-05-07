@@ -1,4 +1,5 @@
 #include "LinkedList.h"
+// LinkedList implementation
 
 LinkedList::LinkedList():head(nullptr) {}
     

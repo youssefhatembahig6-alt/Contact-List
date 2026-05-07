@@ -28,7 +28,8 @@ public:
     void     display(ostream& out)const;                       
     bool     isEmpty();  
     int      mySize(); 
- 
+
+    
 };
 ostream& operator<<(ostream& out, const LinkedList& list);
 #endif
