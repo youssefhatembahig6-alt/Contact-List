@@ -1,9 +1,11 @@
 #include "LinkedList.h"
-// LinkedList implementation
 
+
+//Default constructor
 LinkedList::LinkedList():head(nullptr) {}
     
 
+//Copy constructor
 LinkedList::LinkedList(const LinkedList& other):head(nullptr) {
 
     Node* current = other.head;
@@ -14,6 +16,7 @@ LinkedList::LinkedList(const LinkedList& other):head(nullptr) {
 }
 
 
+//Assignment operator
 LinkedList& LinkedList::operator=(const LinkedList& other) {
 
     if (this == &other) {
@@ -35,6 +38,7 @@ LinkedList& LinkedList::operator=(const LinkedList& other) {
 }
 
 
+//Destructor
 LinkedList::~LinkedList() {
     Node* current = head;
 
@@ -47,8 +51,21 @@ LinkedList::~LinkedList() {
 }
 
 
-bool LinkedList::isEmpty() {
+//Operations
+bool LinkedList::isEmpty() const {
     return head == nullptr;
+}
+
+
+int LinkedList::mySize () const {
+
+    int   count   = 0;
+    Node* current = head;
+    while (current != nullptr) {
+        count++;
+        current = current->next;
+    }
+    return count;
 }
 
 
@@ -66,19 +83,6 @@ void LinkedList::insert(Contact c) {
         current = current->next;
     }
     current->next = newNode;
-}
-
-
-Contact* LinkedList::searchByPhone(string phone) {
-
-    Node* current = head;
-    while (current != nullptr) {
-        if (current->data.phone == phone) {
-            return &(current->data);
-        }
-        current = current->next;
-    }
-    return nullptr;
 }
 
 
@@ -106,21 +110,22 @@ void LinkedList::deleteByPhone(string phone) {
 }
 
 
-int LinkedList::mySize() {
+Contact* LinkedList::searchByPhone(string phone) {
 
-    int   count   = 0;
     Node* current = head;
     while (current != nullptr) {
-        count++;
+        if (current->data.phone == phone) {
+            return &(current->data);
+        }
         current = current->next;
     }
-    return count;
+    return nullptr;
 }
 
 
 void LinkedList::display(ostream& out) const {
 
-    if (head == nullptr) {
+    if (isEmpty()) {
         out << "No contacts in the list.\n";
         return;
     }

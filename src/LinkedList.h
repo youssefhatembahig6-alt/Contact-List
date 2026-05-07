@@ -1,10 +1,10 @@
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
-
 #include "Contact.h"
 #include <iostream>   
 #include <string>      
 using namespace std;   
+
 
 struct Node {
     Contact data;  
@@ -22,14 +22,15 @@ public:
     LinkedList& operator=(const LinkedList& other); 
     ~LinkedList();   
 
+
+    bool     isEmpty()const;  
+    int      mySize()const; 
     void     insert(Contact c);              
     void     deleteByPhone(string phone);
     Contact* searchByPhone(string phone);   
     void     display(ostream& out)const;                       
-    bool     isEmpty();  
-    int      mySize(); 
-
-    
+   
+ 
 };
 ostream& operator<<(ostream& out, const LinkedList& list);
 #endif
