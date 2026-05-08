@@ -17,27 +17,27 @@ class  Node {
     Node*   right;     
     Node( Contact d)  :height(1), data(d), left(nullptr), right(nullptr) {}
 };
-
      Node* root; 
 
 public:
-    AvlTree();                                                        // Done
-    ~AvlTree();                                                       // Done
-    void  AddContact(const Contact& item);                            // Done
-    void  Removecontact(const string name);                           // Done
-    Contact  SearchReq(string name);                                  // Done
-    void  display();                                                  // Done 
+    AvlTree();                                                        
+    ~AvlTree();                                                       
+    void    AddContact(const Contact& item);        
+    void    RemoveContact(const string& name);      
+    void    UpdateContact(const string& name);      
+    Contact SearchReq(const string& name);                                
+    void  display();                                                 
 
 
 private: 
-    void deleteAll(Node*& node);                                       // Done
-    void  inorder(Node* node);                                         // Done
-    Node* leftRotate(Node * node);                                     // Done
-    Node* rightRotate(Node * node);                                    // Done
-    int height(Node* n);                                               // Done
-    int getBalance(Node* n);                                           // Done
-    Node*  insert( Node * node, const Contact& c);                     // Done
-    Node*  remove( Node * node, string name );            // use  SearchReqAux to find contact first-------------           
-    Contact SearchReqAux(Node *&node, string name);                    // Done
-};      
+   void    deleteAll(Node*& node);
+    void    inorder(Node* node);
+    Node*   leftRotate(Node* node);
+    Node*   rightRotate(Node* node);
+    int     height(Node* n);
+    int     getBalance(Node* n);
+    Node*   insert(Node* node, const Contact& c);
+    Node*   remove(Node* node, const string& name);
+    Contact SearchReqAux(Node* node, const string& name);
+};
 #endif
