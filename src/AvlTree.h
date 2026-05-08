@@ -22,12 +22,12 @@ class  Node {
 public:
     AvlTree();                                                        
     ~AvlTree();                                                       
-    void    AddContact(const Contact& item);        
+    bool    AddContact(const Contact& item);        
     void    RemoveContact(const string& name);      
     void    UpdateContact(const string& name);      
     Contact SearchReq(const string& name);                                
-    void  display();                                                 
-
+    void  display();
+                                                  
 
 private: 
    void    deleteAll(Node*& node);
@@ -39,5 +39,6 @@ private:
     Node*   insert(Node* node, const Contact& c);
     Node*   remove(Node* node, const string& name);
     Contact SearchReqAux(Node* node, const string& name);
+    bool searchByPhone(Node* node, const string& phone);
 };
 #endif

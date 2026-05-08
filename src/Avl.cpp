@@ -11,12 +11,15 @@ AvlTree::~AvlTree() {
     deleteAll(root);
 }
 
-
 // just a wrapper to kick off the recursive insert
-void AvlTree::AddContact(const Contact& item) {
+bool AvlTree::AddContact(const Contact& item) {
+    if (searchByPhone(root, item.phone)) {
+        cout << "A contact with phone number \"" << item.phone << "\" already exists.\n";
+        return false;
+    }
     root = insert(root, item);
+    return true;
 }
-
 
 // before deleting, make sure the contact actually exists
 void AvlTree::RemoveContact(const string& name) {
@@ -205,6 +208,13 @@ AvlTree::Node* AvlTree::remove(Node* s, const string& name) {
     return s;
 }
 
+
+// traverse every node looking for a matching phone number
+bool AvlTree::searchByPhone(Node* node, const string& phone) {
+    if (node == nullptr) return false;
+    if (node->data.phone == phone) return true;
+    return searchByPhone(node->left, phone) || searchByPhone(node->right, phone);
+}
 
 // standard BST search — go left if smaller, right if bigger, return when found
 Contact AvlTree::SearchReqAux(Node* node, const string& name) {

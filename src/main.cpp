@@ -14,16 +14,16 @@ void clearInput() {
 //  Menu display
 // ─────────────────────────────────────────────
 void showMenu() {
-    cout << "\n  ╔══════════════════════════════════╗\n";
-    cout << "  ║       CONTACT MANAGER (AVL)      ║\n";
-    cout << "  ╠══════════════════════════════════╣\n";
-    cout << "  ║  1. Add Contact                  ║\n";
-    cout << "  ║  2. Remove Contact               ║\n";
-    cout << "  ║  3. Search Contact               ║\n";
-    cout << "  ║  4. Update Contact               ║\n";
-    cout << "  ║  5. Display All Contacts         ║\n";
-    cout << "  ║  6. Exit                         ║\n";
-    cout << "  ╚══════════════════════════════════╝\n";
+    cout << "\n+====================================+\n";
+    cout << "  |       CONTACT MANAGER (AVL)      |\n";
+    cout << "  +====================================+\n";
+    cout << "  |  1. Add Contact                  |\n";
+    cout << "  |  2. Remove Contact               |\n";
+    cout << "  |  3. Search Contact               |\n";
+    cout << "  |  4. Update Contact               |\n";
+    cout << "  |  5. Display All Contacts         |\n";
+    cout << "  |  6. Exit                         |\n";
+    cout << "  +====================================+\n";
     cout << "  Choice: ";
 }
 
@@ -33,7 +33,7 @@ void showMenu() {
 
 void handleAdd(AvlTree& tree) {
     Contact c;
-    cout << "\n  ── Add New Contact ─────────────────\n";
+    cout << "\n  -- Add New Contact --------------------------------\n";
     cout << "  Name    : "; getline(cin, c.name);
     cout << "  Phone   : "; getline(cin, c.phone);
     cout << "  Email   : "; getline(cin, c.email);
@@ -43,13 +43,13 @@ void handleAdd(AvlTree& tree) {
         cout << "  Name cannot be empty. Contact not added.\n";
         return;
     }
-    tree.AddContact(c);
-    cout << "  Contact \"" << c.name << "\" added successfully.\n";
+    if (tree.AddContact(c))
+        cout << "  Contact \"" << c.name << "\" added successfully.\n";
 }
 
 void handleRemove(AvlTree& tree) {
     string name;
-    cout << "\n  ── Remove Contact ──────────────────\n";
+    cout << "\n  -- Remove Contact ---------------------------------\n";
     cout << "  Enter name to remove: ";
     getline(cin, name);
     tree.RemoveContact(name);
@@ -57,7 +57,7 @@ void handleRemove(AvlTree& tree) {
 
 void handleSearch(AvlTree& tree) {
     string name;
-    cout << "\n  ── Search Contact ──────────────────\n";
+    cout << "\n  -- Search Contact ---------------------------------\n";
     cout << "  Enter name to search: ";
     getline(cin, name);
 
@@ -65,7 +65,7 @@ void handleSearch(AvlTree& tree) {
     if (result.name.empty()) {
         cout << "  Contact \"" << name << "\" not found.\n";
     } else {
-        cout << "\n  ┌─────────────────────────────────\n";
+        cout << "\n┌─────────────────────────────────\n";
         cout << "  │ Name   : " << result.name    << "\n";
         cout << "  │ Phone  : " << result.phone   << "\n";
         cout << "  │ Email  : " << result.email   << "\n";
@@ -76,7 +76,7 @@ void handleSearch(AvlTree& tree) {
 
 void handleUpdate(AvlTree& tree) {
     string name;
-    cout << "\n  ── Update Contact ──────────────────\n";
+    cout << "\n  -- Update Contact ---------------------------------\n";
     cout << "  Enter name of contact to update: ";
     getline(cin, name);
     tree.UpdateContact(name);
@@ -86,9 +86,8 @@ void handleUpdate(AvlTree& tree) {
 //  Entry point
 // ─────────────────────────────────────────────
 int main() {
-    AvlTree tree;
+    AvlTree tree; 
     int choice;
-
     cout << "\n  Welcome to Contact Manager (AVL Tree)\n";
 
     while (true) {
@@ -106,7 +105,7 @@ int main() {
                 cout << "\n  Goodbye!\n\n";
                 return 0;
             default:
-                cout << "  Invalid choice. Please enter 1–6.\n";
+                cout << "  Invalid choice. Please enter 1-6.\n";
         }
     }
 }
