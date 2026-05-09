@@ -1,23 +1,38 @@
 # Contact Management System
 
+**Course:** CSE333 — Data Structures and Algorithms, Spring 2026
+
+---
+
+## Group Members
+
+| Name | ID |
+|------|----|
+|Youssef Hatem |2300837|
+|Ahmed Ayman   |2300145|
+|Yassin Ayman  |2301087|    |
+|Moaz Ali      |2300777|
+|Zeyad Saeed   |2300248|
+
+---
+
 ## Project Description
 
 A Contact Management System implemented in C++ using an **AVL Tree** as the sole data structure. The system allows users to add, search, update, delete, and list contacts efficiently. Available in both a **console interface** and a **Qt-based GUI** that mimics a phone contacts app.
-
-Built as a group project for **CSE333 - Data Structures and Algorithms, Spring 2026.**
 
 ---
 
 ## Data Structure Used
 
 ### AVL Tree
-- Used as the only storage structure for all contacts.
-- A self-balancing Binary Search Tree (BST).
-- After each insertion or deletion, the tree maintains balance using rotations (LL, RR, LR, RL).
-- Supports name-based search in **O(log n)** worst-case time.
-- In-order traversal automatically displays contacts in alphabetical order.
-- Improves over a normal BST by avoiding skewed trees, guaranteeing O(log n) in the worst case.
-- Reflects the **Trees** chapter covered in the course.
+
+The AVL Tree was chosen as the only storage structure for all contacts for the following reasons:
+
+- It is a **self-balancing Binary Search Tree (BST)** that guarantees **O(log n)** performance in the worst case for insertion, deletion, and search — unlike a regular BST which can degrade to O(n) on skewed input.
+- After each insertion or deletion, the tree maintains balance automatically using **rotations (LL, RR, LR, RL)**.
+- **In-order traversal** naturally produces contacts in alphabetical order, making sorted display O(n) with no extra sorting step.
+- Name-based ordering makes it a natural fit for a contacts app where lookup by name is the primary operation.
+- The structure directly reflects the **Trees** chapter covered in CSE333.
 
 ---
 
@@ -31,33 +46,17 @@ Built as a group project for **CSE333 - Data Structures and Algorithms, Spring 2
 | 4 | Delete a contact | O(log n) |
 | 5 | Display all contacts in alphabetical order | O(n) |
 
----
-
-
 ### Qt GUI (Phone-Style)
-A modern dark-themed desktop GUI built with **Qt Widgets** that mimics a phone contacts app.
 
-- Contacts list always displayed in alphabetical order with **letter section headers (A, B, C...)**
-- **Colored avatar circles** generated from the contact's name
+A modern dark-themed desktop GUI built with **Qt Widgets** that mimics a phone contacts app:
+
+- Contacts list always displayed alphabetically with **letter section headers (A, B, C…)**
+- **Colored avatar circles** generated from the contact's initials
 - **Live search bar** — filters contacts as you type
 - **`+` button** to add a new contact via a clean dialog
 - **Click any contact** to view full details with Edit and Delete options
 - Phone number **validation** on add and edit
 - Duplicate phone number **prevention**
-
----
-
-## Time Complexity Summary
-
-| Operation | Data Structure | Complexity |
-|-----------|---------------|------------|
-| Add contact | AVL Tree | O(log n) |
-| Search by name | AVL Tree | O(log n) |
-| Delete contact | AVL Tree | O(log n) |
-| Update contact | AVL Tree (remove + insert) | O(log n) |
-| List alphabetically | AVL in-order traversal | O(n) |
-
-> **Note:** Updating works by removing the old record and inserting the updated one. If the name changes, the tree re-orders it automatically since ordering is name-based.
 
 ---
 
@@ -104,15 +103,29 @@ contacts.exe
 # Open in Qt Creator
 File → Open File or Project → select ContactList.pro
 
-# Configure with Desktop kit, then:
+# Configure with a Desktop kit, then:
 Ctrl+B   # Build
 Ctrl+R   # Run
 ```
 
 ---
 
-## Notes
+## Time Complexity Summary
 
-- All AVL Tree operations are **O(log n)** in the worst case because the tree stays balanced after every operation through rotations.
-- Listing all contacts uses in-order traversal which visits every node once — **O(n)**.
-- The GUI uses a **function pointer callback** pattern to traverse the AVL tree and populate the UI without relying on STL containers, keeping the data structure implementation pure.
+| Operation | Data Structure | Complexity |
+|-----------|---------------|------------|
+| Add contact | AVL Tree | O(log n) |
+| Search by name | AVL Tree | O(log n) |
+| Delete contact | AVL Tree | O(log n) |
+| Update contact | AVL Tree (remove + insert) | O(log n) |
+| List alphabetically | AVL in-order traversal | O(n) |
+
+> **Note:** Updating works by removing the old record and inserting the updated one. If the name changes, the tree re-orders it automatically since ordering is name-based.
+
+---
+
+## AI Usage Declaration
+
+AI tools were used to assist in developing the Qt-based GUI. This includes help with designing the interface layout, widget styling, and GUI logic implementation. All core data structure logic (AVL Tree operations) was implemented independently by the team.
+
+---
