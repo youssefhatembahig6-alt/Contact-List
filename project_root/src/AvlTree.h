@@ -27,6 +27,7 @@ public:
     void    UpdateContact(const string& name);      
     Contact SearchReq(const string& name);                                
     void  display();
+    void getAll(void (*visit)(const Contact&, void*), void* ctx);
                                                   
 
 private: 
@@ -40,5 +41,7 @@ private:
     Node*   remove(Node* node, const string& name);
     Contact SearchReqAux(Node* node, const string& name);
     bool searchByPhone(Node* node, const string& phone);
+    void getAllAux(Node* node, void (*visit)(const Contact&, void*), void* ctx);
+
 };
 #endif

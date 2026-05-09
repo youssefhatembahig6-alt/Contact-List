@@ -216,10 +216,28 @@ bool AvlTree::searchByPhone(Node* node, const string& phone) {
     return searchByPhone(node->left, phone) || searchByPhone(node->right, phone);
 }
 
+
 // standard BST search — go left if smaller, right if bigger, return when found
 Contact AvlTree::SearchReqAux(Node* node, const string& name) {
     if (node == nullptr)        return Contact();  // not found, return empty contact
     if (name < node->data.name) return SearchReqAux(node->left,  name);
     if (name > node->data.name) return SearchReqAux(node->right, name);
     return node->data;  // found it
+}
+
+
+// just a wrapper to kick off the recursive traversal
+void AvlTree::getAll(void (*visit)(const Contact&, void*), void* ctx) {
+    getAllAux(root, visit, ctx);
+}
+
+
+// same inorder traversal as display(), but instead of printing,
+// we call the function the caller gave us on each contact —
+// ctx carries whatever the caller needs (in our case, the table pointer)
+void AvlTree::getAllAux(Node* node, void (*visit)(const Contact&, void*), void* ctx) {
+    if (node == nullptr) return;
+    getAllAux(node->left,  visit, ctx);
+    visit(node->data, ctx);          // hand this contact to the caller's function
+    getAllAux(node->right, visit, ctx);
 }

@@ -1,2 +1,20 @@
 .vscode/
 src/contacts
+# Qt Creator
+*.pro.user
+*.pro.user.*
+.qtcreator/
+
+# Build output
+build/
+*.o
+*.obj
+Makefile
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
+*.moc
+
+# OS files
+.DS_Store
+Thumbs.db
