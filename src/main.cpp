@@ -3,8 +3,9 @@
 #include <string>
 #include <algorithm>
 #include "AvlTree.h"
-#include "validation.cpp"
+#include "validation.h"
 using namespace std;
+
 
 // ─────────────────────────────────────────────
 //  Helper: clear the input buffer safely

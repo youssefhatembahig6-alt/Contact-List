@@ -2,6 +2,7 @@
 #include <cctype>
 #include <string>
 #include <algorithm>
+#include "validation.h"
 
 
 bool isValidPhone(const std::string& phone) {
