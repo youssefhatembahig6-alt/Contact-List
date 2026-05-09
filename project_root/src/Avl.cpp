@@ -6,10 +6,12 @@
 // start with an empty tree
 AvlTree::AvlTree():root(nullptr) {}
 
+
 // clean up everything when the program ends
 AvlTree::~AvlTree() {
     deleteAll(root);
 }
+
 
 // just a wrapper to kick off the recursive insert
 bool AvlTree::AddContact(const Contact& item) {
@@ -20,6 +22,7 @@ bool AvlTree::AddContact(const Contact& item) {
     root = insert(root, item);
     return true;
 }
+
 
 // before deleting, make sure the contact actually exists
 void AvlTree::RemoveContact(const string& name) {
