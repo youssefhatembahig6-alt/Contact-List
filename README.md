@@ -18,7 +18,7 @@
 
 ## Project Description
 
-A Contact Management System implemented in C++ using an **AVL Tree** as the sole data structure. The system allows users to add, search, update, delete, and list contacts efficiently. Available in both a **console interface** and a **Qt-based GUI** that mimics a phone contacts app.
+A Contact Management System implemented in C++ using an **AVL Tree** as the sole data structure. The system allows users to add, search, update, delete, and list contacts efficiently. Available in  **Qt-based GUI** that mimics a phone contacts app.
 
 ---
 
