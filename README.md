@@ -40,9 +40,9 @@ The AVL Tree was chosen as the only storage structure for all contacts for the f
 
 | # | Feature | Complexity |
 |---|---------|------------|
-| 1 | Add a new contact (name, phone, email, address) | O(log n) |
+| 1 | Add a new contact (name, phone, email, address) | O(n) |
 | 2 | Search contact by name | O(log n) |
-| 3 | Update an existing contact | O(log n) |
+| 3 | Update an existing contact | O(n) |
 | 4 | Delete a contact | O(log n) |
 | 5 | Display all contacts in alphabetical order | O(n) |
 
