@@ -18,4 +18,4 @@ qrc_*.cpp
 # OS files
 .DS_Store
 Thumbs.db
-src/db_config.h
+project_root/src/db_config.h
