@@ -10,6 +10,7 @@
 #include <QMessageBox>
 #include <algorithm>
 #include <cctype>
+#include "src/Database.h"
 
 // ── Validation ────────────────────────────────────────────────────────────────
 
@@ -60,7 +61,7 @@ static void addContactItem(const Contact& c, void* raw) {
             QListWidgetItem* hdr = new QListWidgetItem(ctx->list);
             hdr->setFlags(Qt::NoItemFlags);
             hdr->setSizeHint(QSize(0, 30));
-            hdr->setData(Qt::UserRole, QString()); // empty = not a real contact
+            hdr->setData(Qt::UserRole, QString());
 
             QLabel* lbl = new QLabel(QString(QChar(letter)));
             lbl->setStyleSheet(
@@ -74,7 +75,7 @@ static void addContactItem(const Contact& c, void* raw) {
     // contact row
     QListWidgetItem* item = new QListWidgetItem(ctx->list);
     item->setSizeHint(QSize(0, 64));
-    item->setData(Qt::UserRole, name); // stored so we can look it up on click
+    item->setData(Qt::UserRole, name);
 
     QWidget* row = new QWidget();
     row->setAttribute(Qt::WA_TranslucentBackground);
@@ -82,7 +83,6 @@ static void addContactItem(const Contact& c, void* raw) {
     lay->setContentsMargins(14, 0, 14, 0);
     lay->setSpacing(14);
 
-    // colored circle avatar
     QLabel* av = new QLabel(QString(QChar(toupper(c.name[0]))));
     av->setFixedSize(46, 46);
     av->setAlignment(Qt::AlignCenter);
@@ -112,11 +112,23 @@ MainWindow::MainWindow(QWidget *parent)
     resize(430, 680);
     applyStyle();
 
-    connect(ui->searchBar,    &QLineEdit::textChanged,
+    // ── NEW: warn user if DB is unreachable, but still let the app run ────
+    if (!db.isConnected()) {
+        QMessageBox::warning(this, "Database Error",
+            "Could not connect to MySQL.\n"
+            "Contacts will NOT be saved between sessions.\n\n"
+            "Check Database.h for HOST / USER / PASS / DBNAME.");
+    } else {
+        // ── NEW: load all contacts from DB into the AVL tree at startup ──
+        for (const Contact& c : db.loadAll())
+            tree.AddContact(c);
+    }
+
+    connect(ui->searchBar,   &QLineEdit::textChanged,
             this, &MainWindow::onSearchChanged);
-    connect(ui->btnAdd,       &QPushButton::clicked,
+    connect(ui->btnAdd,      &QPushButton::clicked,
             this, &MainWindow::onAddClicked);
-    connect(ui->contactList,  &QListWidget::itemClicked,
+    connect(ui->contactList, &QListWidget::itemClicked,
             this, &MainWindow::onContactClicked);
 
     refreshList();
@@ -136,7 +148,7 @@ void MainWindow::onAddClicked() {
 
 void MainWindow::onContactClicked(QListWidgetItem* item) {
     QString name = item->data(Qt::UserRole).toString();
-    if (name.isEmpty()) return; // alphabet header — ignore
+    if (name.isEmpty()) return;
     Contact c = tree.SearchReq(name.toStdString());
     if (!c.name.empty()) showContactDialog(c);
 }
@@ -147,12 +159,11 @@ void MainWindow::refreshList(const QString& filter) {
     ui->contactList->clear();
 
     ListCtx ctx;
-    ctx.list        = ui->contactList;
-    ctx.filter      = filter;
-    ctx.lastLetter  = 0;
+    ctx.list       = ui->contactList;
+    ctx.filter     = filter;
+    ctx.lastLetter = 0;
     tree.getAll(addContactItem, &ctx);
 
-    // empty state
     if (ui->contactList->count() == 0) {
         QListWidgetItem* emp = new QListWidgetItem(ui->contactList);
         emp->setFlags(Qt::NoItemFlags);
@@ -185,7 +196,6 @@ void MainWindow::showAddDialog(const Contact* prefill) {
     vl->setSpacing(14);
     vl->setContentsMargins(24, 24, 24, 24);
 
-    // helper to add a labelled field
     auto field = [&](const QString& label, const QString& val) -> QLineEdit* {
         vl->addWidget(new QLabel(label));
         QLineEdit* e = new QLineEdit(val);
@@ -206,7 +216,6 @@ void MainWindow::showAddDialog(const Contact* prefill) {
     btnSave->setStyleSheet("background:#64B5F6;color:#111;");
     vl->addWidget(btnSave);
 
-    // keep a copy of the original name for update (remove + re-insert)
     std::string oldName = prefill ? prefill->name : "";
 
     connect(btnSave, &QPushButton::clicked, [&]() {
@@ -218,16 +227,43 @@ void MainWindow::showAddDialog(const Contact* prefill) {
         c.email   = eEmail->text().trimmed().toStdString();
         c.address = eAddress->text().trimmed().toStdString();
 
-        if (c.name.empty())         { errLbl->setText("Name cannot be empty.");   return; }
-        if (!isValidPhone(c.phone)) { errLbl->setText("Invalid phone number.");   return; }
+        if (c.name.empty())         { errLbl->setText("Name cannot be empty.");  return; }
+        if (!isValidPhone(c.phone)) { errLbl->setText("Invalid phone number.");  return; }
 
-        if (prefill) tree.RemoveContact(oldName); // remove old before re-inserting
+        if (prefill) {
+            // ── UPDATE path ───────────────────────────────────────────────
+            tree.RemoveContact(oldName);
 
-        if (!tree.AddContact(c)) {
-            if (prefill) tree.AddContact(*prefill); // restore if duplicate phone
-            errLbl->setText("Phone number already exists.");
-            return;
+            if (!tree.AddContact(c)) {
+                tree.AddContact(*prefill);          // restore on duplicate phone
+                errLbl->setText("Phone number already exists.");
+                return;
+            }
+
+            // ── NEW: update the DB row ────────────────────────────────────
+            if (db.isConnected() && !db.updateContact(oldName, c)) {
+                errLbl->setText("DB update failed — check console.");
+                // rollback the in-memory change
+                tree.RemoveContact(c.name);
+                tree.AddContact(*prefill);
+                return;
+            }
+
+        } else {
+            // ── INSERT path ───────────────────────────────────────────────
+            if (!tree.AddContact(c)) {
+                errLbl->setText("Phone number already exists.");
+                return;
+            }
+
+            // ── NEW: persist to DB ────────────────────────────────────────
+            if (db.isConnected() && !db.insertContact(c)) {
+                errLbl->setText("DB insert failed — check console.");
+                tree.RemoveContact(c.name);         // rollback in-memory
+                return;
+            }
         }
+
         dlg.accept();
     });
 
@@ -251,7 +287,6 @@ void MainWindow::showContactDialog(const Contact& c) {
     vl->setSpacing(10);
     vl->setContentsMargins(24, 28, 24, 24);
 
-    // large avatar
     QLabel* av = new QLabel(QString(QChar(toupper(c.name[0]))));
     av->setFixedSize(80, 80);
     av->setAlignment(Qt::AlignCenter);
@@ -262,19 +297,16 @@ void MainWindow::showContactDialog(const Contact& c) {
     avRow->addStretch(); avRow->addWidget(av); avRow->addStretch();
     vl->addLayout(avRow);
 
-    // name
     QLabel* nameLbl = new QLabel(QString::fromStdString(c.name));
     nameLbl->setAlignment(Qt::AlignCenter);
     nameLbl->setStyleSheet("font-size:20px;font-weight:bold;color:white;");
     vl->addWidget(nameLbl);
 
-    // divider
     QFrame* line = new QFrame();
     line->setFrameShape(QFrame::HLine);
     line->setStyleSheet("color:#333;");
     vl->addWidget(line);
 
-    // info rows
     auto addInfo = [&](const QString& icon, const QString& label, const QString& val) {
         if (val.isEmpty()) return;
         QLabel* lbl = new QLabel(icon + "  " + label);
@@ -290,7 +322,6 @@ void MainWindow::showContactDialog(const Contact& c) {
 
     vl->addSpacing(8);
 
-    // edit / delete buttons
     QHBoxLayout* btnRow = new QHBoxLayout();
     QPushButton* btnEdit = new QPushButton("Edit");
     QPushButton* btnDel  = new QPushButton("Delete");
@@ -300,7 +331,6 @@ void MainWindow::showContactDialog(const Contact& c) {
     btnRow->addWidget(btnDel);
     vl->addLayout(btnRow);
 
-    // capture c by value so it stays valid after dlg closes
     Contact copy = c;
 
     connect(btnEdit, &QPushButton::clicked, [&]() {
@@ -312,6 +342,10 @@ void MainWindow::showContactDialog(const Contact& c) {
         auto ans = QMessageBox::question(&dlg, "Delete",
             "Delete " + QString::fromStdString(copy.name) + "?");
         if (ans == QMessageBox::Yes) {
+            // ── NEW: delete from DB first, then from tree ─────────────────
+            if (db.isConnected())
+                db.deleteContact(copy.name);
+
             tree.RemoveContact(copy.name);
             dlg.accept();
             refreshList(ui->searchBar->text().trimmed());
@@ -326,27 +360,21 @@ void MainWindow::showContactDialog(const Contact& c) {
 void MainWindow::applyStyle() {
     setStyleSheet(
         "QMainWindow,QWidget#centralwidget{background:#121212;}"
-
         "QWidget#header{background:#121212;}"
-
         "QLabel#titleLabel{color:white;font-size:26px;font-weight:bold;}"
-
         "QPushButton#btnAdd{"
         "  background:transparent;color:white;font-size:30px;"
         "  border:none;padding:0 6px;}"
         "QPushButton#btnAdd:hover{color:#64B5F6;}"
-
         "QLineEdit#searchBar{"
         "  background:#2a2a2a;border-radius:20px;"
         "  color:white;font-size:14px;"
         "  padding:8px 16px;border:none;"
         "  margin:4px 12px 8px 12px;}"
-
         "QListWidget#contactList{"
         "  background:#121212;border:none;outline:none;}"
         "QListWidget#contactList::item:selected{background:#2a2a2a;}"
         "QListWidget#contactList::item:hover{background:#1a1a1a;}"
-
         "QScrollBar:vertical{background:#121212;width:4px;}"
         "QScrollBar::handle:vertical{background:#333;border-radius:2px;}"
         "QScrollBar::add-line:vertical,QScrollBar::sub-line:vertical{height:0;}"

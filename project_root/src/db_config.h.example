@@ -1,0 +1,6 @@
+// Copy this file to db_config.h and fill in your own credentials
+#define DB_HOST "localhost"
+#define DB_USER "root"
+#define DB_PASS ""           // your password here
+#define DB_NAME "contact_db"
+#define DB_PORT 3306
