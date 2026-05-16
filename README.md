@@ -10,7 +10,7 @@
 |------|----|
 |Youssef Hatem |2300837|
 |Ahmed Ayman   |2300145|
-|Yassin Ayman  |2301087|    |
+|Yassin Ayman  |2301087|
 |Moaz Ali      |2300777|
 |Zeyad Saeed   |2300248|
 
@@ -18,7 +18,7 @@
 
 ## Project Description
 
-A Contact Management System implemented in C++ using an **AVL Tree** as the sole data structure. The system allows users to add, search, update, delete, and list contacts efficiently. Available in  **Qt-based GUI** that mimics a phone contacts app.
+A Contact Management System implemented in C++ using an **AVL Tree** as the sole data structure. The system allows users to add, search, update, delete, and list contacts efficiently. Available as a **Qt-based GUI** that mimics a phone contacts app, with full **MySQL database persistence** so contacts are saved between sessions.
 
 ---
 
@@ -40,11 +40,13 @@ The AVL Tree was chosen as the only storage structure for all contacts for the f
 
 | # | Feature | Complexity |
 |---|---------|------------|
-| 1 | Add a new contact (name, phone, email, address) | O(n) |
+| 1 | Add a new contact (name, phone, email, address) | O(log n) |
 | 2 | Search contact by name | O(log n) |
-| 3 | Update an existing contact | O(n) |
+| 3 | Update an existing contact | O(log n) |
 | 4 | Delete a contact | O(log n) |
 | 5 | Display all contacts in alphabetical order | O(n) |
+| 6 | Persist contacts to MySQL database | — |
+| 7 | Load contacts from database on startup | — |
 
 ### Qt GUI (Phone-Style)
 
@@ -57,55 +59,149 @@ A modern dark-themed desktop GUI built with **Qt Widgets** that mimics a phone c
 - **Click any contact** to view full details with Edit and Delete options
 - Phone number **validation** on add and edit
 - Duplicate phone number **prevention**
+- All changes **automatically saved to MySQL** and reloaded on next launch
 
 ---
 
 ## File Structure
 
 ```
-project_root/
-├── main.cpp              — Qt entry point
-├── mainwindow.h          — Qt window class declaration
-├── mainwindow.cpp        — Qt GUI logic
-├── mainwindow.ui         — Qt Designer layout (XML)
-├── ContactList.pro       — Qt project file
-└── src/
-    ├── Contact.h         — Contact struct (name, phone, email, address)
-    ├── AvlTree.h         — AVL Tree class declaration
-    ├── Avl.cpp           — AVL Tree implementation
-    └── main.cpp          — Console menu and user interaction
+Contact-List/
+├── .gitignore
+├── README.md
+└── project_root/
+    ├── main.cpp                  — Qt entry point
+    ├── mainwindow.h              — Qt window class declaration
+    ├── mainwindow.cpp            — Qt GUI logic + DB integration
+    ├── mainwindow.ui             — Qt Designer layout (XML)
+    ├── ContactList.pro           — Qt project file
+    └── src/
+        ├── Contact.h             — Contact struct (name, phone, email, address)
+        ├── AvlTree.h             — AVL Tree class declaration
+        ├── Avl.cpp               — AVL Tree implementation
+        ├── Database.h            — MySQL Database class declaration
+        ├── Database.cpp          — MySQL Database implementation
+        ├── contacts.sql          — MySQL schema (run once before first launch)
+        └── db_config.h.example   — Database credentials template
+```
+
+> **Note:** `db_config.h` is not included in the repo (contains credentials). Copy `db_config.h.example` to `db_config.h` and fill in your own credentials.
+
+---
+
+## Setup & How to Run
+
+### Step 1 — Set your database credentials
+
+Copy the example config file and fill in your MySQL credentials:
+
+**🐧 Linux:**
+```bash
+cp project_root/src/db_config.h.example project_root/src/db_config.h
+```
+
+**🪟 Windows:**
+```cmd
+copy project_root\src\db_config.h.example project_root\src\db_config.h
+```
+
+Then open `db_config.h` and edit it:
+```cpp
+#ifndef DB_CONFIG_H
+#define DB_CONFIG_H
+
+#define DB_HOST "localhost"
+#define DB_USER "root"
+#define DB_PASS "your_password_here"   // ← put your MySQL password here
+#define DB_NAME "contact_db"
+#define DB_PORT 3306
+
+#endif
 ```
 
 ---
 
-## How to Compile and Run
+### Step 2 — Install Requirements
 
-### Console Version
-
-**Requirements:** g++ with C++17 support
-
+#### 🐧 Linux (Fedora/RHEL)
 ```bash
-# Compile
-g++ src/main.cpp src/Avl.cpp -o contacts
-
-# Run (Linux/Mac)
-./contacts
-
-# Run (Windows)
-contacts.exe
+sudo dnf install mysql-server mysql-devel -y
 ```
 
-### Qt GUI Version
-
-**Requirements:** Qt 6 (or Qt 5.15+) with Qt Widgets, Qt Creator
-
+#### 🐧 Linux (Ubuntu/Debian)
 ```bash
-# Open in Qt Creator
-File → Open File or Project → select ContactList.pro
+sudo apt install mysql-server libmysqlclient-dev -y
+```
 
-# Configure with a Desktop kit, then:
-Ctrl+B   # Build
-Ctrl+R   # Run
+#### 🪟 Windows
+1. Download and install **MySQL Community Server** from https://dev.mysql.com/downloads/mysql/
+2. Download and install **MySQL Connector/C** from https://dev.mysql.com/downloads/connector/c/
+3. Make sure MySQL is added to your system PATH during installation
+
+---
+
+### Step 3 — Start MySQL
+
+#### 🐧 Linux
+```bash
+sudo systemctl start mysqld
+sudo systemctl enable mysqld   # optional: auto-start on boot
+```
+
+#### 🪟 Windows
+MySQL starts automatically after installation. If not, open **Services** from the Start menu and start **MySQL80**.
+
+Or from Command Prompt (as Administrator):
+```cmd
+net start MySQL80
+```
+
+---
+
+### Step 4 — Create the Database (run once)
+
+#### 🐧 Linux
+```bash
+cd ~/Contact-List/project_root/src
+mysql -u root -p < contacts.sql
+```
+
+#### 🪟 Windows (Command Prompt)
+```cmd
+cd C:\path\to\Contact-List\project_root\src
+mysql -u root -p < contacts.sql
+```
+
+Or open **MySQL Workbench** → File → Open SQL Script → select `contacts.sql` → click ⚡ Execute.
+
+---
+
+### Step 5 — Build and Run
+
+#### 🐧 Linux
+```bash
+cd ~/Contact-List/project_root/build
+qmake ../ContactList.pro
+make
+./ContactList
+```
+
+#### 🪟 Windows (Qt Creator — recommended)
+1. Open **Qt Creator**
+2. File → Open File or Project → select `ContactList.pro`
+3. In `ContactList.pro`, make sure these lines exist:
+```
+INCLUDEPATH += C:/Program Files/MySQL/MySQL Connector C 6.1/include
+LIBS += -LC:/Program Files/MySQL/MySQL Connector C 6.1/lib -lmysqlclient
+```
+4. Press `Ctrl+B` to build, `Ctrl+R` to run
+
+#### 🪟 Windows (Command Prompt with MinGW)
+```cmd
+cd C:\path\to\Contact-List\project_root\build
+qmake ../ContactList.pro
+mingw32-make
+ContactList.exe
 ```
 
 ---
@@ -114,18 +210,17 @@ Ctrl+R   # Run
 
 | Operation | Data Structure | Complexity |
 |-----------|---------------|------------|
-| Add contact | AVL Tree | O(log n) |
+| Add contact | AVL Tree + MySQL INSERT | O(log n) |
 | Search by name | AVL Tree | O(log n) |
-| Delete contact | AVL Tree | O(log n) |
-| Update contact | AVL Tree (remove + insert) | O(log n) |
+| Delete contact | AVL Tree + MySQL DELETE | O(log n) |
+| Update contact | AVL Tree + MySQL UPDATE | O(log n) |
 | List alphabetically | AVL in-order traversal | O(n) |
-
-> **Note:** Updating works by removing the old record and inserting the updated one. If the name changes, the tree re-orders it automatically since ordering is name-based.
+| Load on startup | MySQL SELECT | O(n) |
 
 ---
 
 ## AI Usage Declaration
 
-AI tools were used to assist in developing the Qt-based GUI. This includes help with designing the interface layout, widget styling, and GUI logic implementation. All core data structure logic (AVL Tree operations) was implemented independently by the team.
+AI tools were used to assist in developing the Qt-based GUI and MySQL database integration. This includes help with designing the interface layout, widget styling, GUI logic, and database connectivity. All core data structure logic (AVL Tree operations) was implemented independently by the team.
 
 ---
